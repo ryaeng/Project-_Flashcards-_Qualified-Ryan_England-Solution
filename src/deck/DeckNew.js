@@ -1,12 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { createDeck } from "../utils/api";
 
 import NavBar from "../Layout/NavBar";
 
-const DeckNew = ({ form, setForm, handleFormChange }) => {
+const DeckNew = () => {
+    const [form, setForm] = useState({ name: "", description: "" });
     const history = useHistory();
+
+    const handleFormChange = (event) => {
+        const { name, value } = event.target;
+        setForm({ ...form, [name]: value });
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();

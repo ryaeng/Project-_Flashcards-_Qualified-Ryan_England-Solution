@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom/cjs/react-router-dom";
 
-import { readDeck } from "../utils/api/index";
+import { readDeck, updateDeck } from "../utils/api/index";
 
 import NavBar from "../Layout/NavBar";
 
@@ -14,7 +14,9 @@ const DeckEdit = ({ form, setForm, handleFormChange }) => {
 
         readDeck(deckId, abortController.signal).then(setForm);
 
-    }, []);
+    }, [deckId, setForm]);
+
+    const history = useHistory();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -24,8 +26,6 @@ const DeckEdit = ({ form, setForm, handleFormChange }) => {
 
         return () => abortController.abort();
     };
-
-    const history = useHistory();
 
     return(
         <>
@@ -42,7 +42,7 @@ const DeckEdit = ({ form, setForm, handleFormChange }) => {
                             id="name" 
                             name="name" 
                             placeholder="Deck Name" 
-                            onChange={handleFormChange}
+                            onChange={event => handleFormChange(event, form, setForm)}
                             value={form.name}
                         />
                     </div>
@@ -53,7 +53,7 @@ const DeckEdit = ({ form, setForm, handleFormChange }) => {
                         id="description"
                         name="description"
                         placeholder="Brief description of the deck"
-                        onChange={handleFormChange}
+                        onChange={event => handleFormChange(event, form, setForm)}
                         value={form.description}
                     />
                 </div>

@@ -14,7 +14,7 @@ const DeckStudy = ({ deck, setDeck }) => {
         readDeck(deckId, abortController.signal).then(setDeck);
 
         return () => abortController.abort();
-    }, [deckId]);
+    }, [deckId, setDeck]);
 
     let [count, setCount] = useState(0);
     let [flipped, setFlipped] = useState(false);
@@ -26,11 +26,11 @@ const DeckStudy = ({ deck, setDeck }) => {
     const history = useHistory();
 
     const nextClickHandler = () => {
-        if (count < deck.cards.length) {
+        if (count < deck.cards.length - 1) {
             setCount((currentCount) => currentCount + 1);
         } else {
-            if (window.confirm("Restart cards?") === true) {
-                setCount("0");
+            if (window.confirm("Restart cards?")) {
+                setCount(0);
             } else {
                 history.push("/");
             }
@@ -46,6 +46,7 @@ const DeckStudy = ({ deck, setDeck }) => {
                     <div className="container">
                         <h4>Not enough cards</h4>
                         <p>You need at least 3 cards to study. There are {deck.cards.length} cards in the deck</p>
+                        <button onClick={() => history.push(`/decks/${deckId}/cards/new`)}>Add Cards</button>
                     </div>
                 : 
                     <div>

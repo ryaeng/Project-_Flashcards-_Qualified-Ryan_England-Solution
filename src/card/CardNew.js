@@ -6,32 +6,19 @@ import { readDeck } from "../utils/api/index";
 import NavBar from "../Layout/NavBar";
 import CardForm from "./CardForm";
 
-const CardNew = ({ deck, setDeck, handleFormChange}) => {
+const CardNew = () => {
     const { deckId } = useParams();
+    const [deck, setDeck] = useState({});
+    const [card, setCard] = useState({ front: "", back: "", id: 0 });
 
     // You must use the readDeck() function from src/utils/api/index.js to load the deck that you're adding the card to.
     useEffect(() => {
-        const abortController = new AbortController;
+        const abortController = new AbortController();
 
         readDeck(deckId, abortController.signal).then(setDeck);
 
         return () => abortController.abort();
-    }, []);
-
-    const [form, setForm] = useState({ front: "", back: ""});
-
-    /* 
-        If the user clicks Save, a new card is created and associated with the relevant deck. 
-        Then the form is cleared and the process for adding a card is restarted. 
-    */
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const abortController = new AbortController();
-        
-        createCard(deckId, form, abortController.signal)
-
-        setForm({ front: "", back: "" });
-    };
+    }, [deckId, setDeck]);
 
     return(
         <>
@@ -42,9 +29,10 @@ const CardNew = ({ deck, setDeck, handleFormChange}) => {
             <h4>{deck.name}: Add Card</h4>
 
             {/* A form is shown with the "front" and "back" fields for a new card. Both fields use a <textarea> tag that can accommodate multiple lines of text. */}
-            <CardForm form={form}
-                handleFormChange={handleFormChange}
-                handleSubmit={handleSubmit}
+            <CardForm 
+                deckId={deck.id}
+                card={card}
+                setCard={setCard}
             />
         </>
     )

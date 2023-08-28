@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { readCard, readDeck } from "../utils/api/index";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import NavBar from "../Layout/NavBar";
 import CardForm from "./CardForm";
 
-const CardEdit = ({ deck, setDeck, form, setForm, handleFormChange }) => {
+const CardEdit = ({ deck, setDeck }) => {
     const { deckId, cardId } = useParams();
+    const [card, setCard] = useState({ front: "", back: "", id: 0 });
 
     /* 
         You must use the readDeck() function from src/utils/api/index.js to load 
@@ -16,35 +17,14 @@ const CardEdit = ({ deck, setDeck, form, setForm, handleFormChange }) => {
           that you want to edit.
     */
     useEffect(() => {
-        const abortController = new AbortController;
+        const abortController = new AbortController();
 
         readDeck(deckId, abortController.signal).then(setDeck);
 
-        readCard(cardId, abortController.signal).then(setForm);
+        readCard(cardId, abortController.signal).then(setCard);
         
         return () => abortController.abort();
-    }, []);
-
-    /*
-    const handleFormChange = (event) => {
-        const { name, value } = event.target;
-        setForm({ ...form, [name]: value });
-    };
-    */
-
-    const history = useHistory();
-
-    /* If the user clicks on either Save or Cancel, the user is taken to the Deck screen. */
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const abortController = new AbortController();
-        
-        updateCard(form, abortController.signal).then(() => {
-            history.push(`/decks/${deckId}`);
-        });
-
-        return () => abortController.abort();
-    };
+    }, [cardId, deckId, setDeck]);
 
     return(
         <>
@@ -61,9 +41,10 @@ const CardEdit = ({ deck, setDeck, form, setForm, handleFormChange }) => {
                   prefilled with information for the existing card. It can be 
                   edited and updated. 
             */}
-            <CardForm form={form} 
-                handleFormChange={handleFormChange} 
-                handleSubmit={handleSubmit} 
+            <CardForm 
+                deckId={deckId}
+                card={card}
+                setCard={setCard}
             />
         </>
     )

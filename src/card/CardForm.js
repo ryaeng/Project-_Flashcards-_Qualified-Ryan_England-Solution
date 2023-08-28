@@ -1,8 +1,33 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-const CardForm = ({ form, handleFormChange, handleSubmit }) => {
-    const location = useLocation();
+import { createCard, updateCard } from "../utils/api/index";
+
+const CardForm = ({ deckId, card, setCard }) => {
+    const handleFormChange = (event) => {
+        const { name, value } = event.target;
+        setCard({ ...card, [name]: value });
+    };
+
+    const history = useHistory();
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const abortController = new AbortController();
+
+        console.log(card);
+        
+        if (card.id === 0) {
+            createCard(deckId, card, abortController.signal);
+            setCard({ front: "", back: "", id: 0 });
+        } else {
+            updateCard(card, abortController.signal).then(() => {
+                history.push(`/decks/${deckId}`);
+            });
+        }
+        
+        return () => abortController.abort();
+    };
 
     return(
         <form onSubmit={handleSubmit}>
@@ -13,7 +38,7 @@ const CardForm = ({ form, handleFormChange, handleSubmit }) => {
                     name="front"
                     placeholder="Front side of card"
                     onChange={handleFormChange}
-                    value={form.front}
+                    value={card.front}
                 />
             </div>
             <div>
@@ -23,12 +48,12 @@ const CardForm = ({ form, handleFormChange, handleSubmit }) => {
                     name="back"
                     placeholder="Back side of card"
                     onChange={handleFormChange}
-                    value={form.back}
+                    value={card.back}
                 />
             </div>
             {/* If the user clicks Done, the user is taken to the Deck screen. */}
-            <button onClick={() => history.push(`/decks/${deckId}`)}>
-                { location.pathname.indexOf("/edit") > -1 ? "Cancel" : "Done" }
+            <button type="button" onClick={() => history.push(`/decks/${deckId}`)}>
+                Cancel
             </button>
             <button type="submit">Save</button>
         </form>

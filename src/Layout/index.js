@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Route, Switch, useHistory } from "react-router-dom";
-
-import { listDecks } from "../utils/api/index"
 
 import Header from "./Header";
 import NotFound from "./NotFound";
@@ -17,21 +15,12 @@ import DeckStudy from "../deck/DeckStudy";
 
 function Layout() {
   const [cardForm, setCardForm] = useState({ front: "", back: "" });
-  const [decks, setDecks] = useState([]);
   const [deck, setDeck] = useState({ cards: [{ id: 0 }] });
   const [deckForm, setDeckForm] = useState({ name: "", description: "" });
 
-  useEffect(() => {
-      const abortController = new AbortController();
-
-      listDecks(abortController.signal).then(setDecks);
-
-      return () => abortController.abort;
-  }, []);
-
   const history = useHistory();
 
-  const handleFormChange = (event) => {
+  const handleFormChange = (event, form, setForm) => {
     const { name, value } = event.target;
     setForm({ ...form, [name]: value });
   };
@@ -44,14 +33,10 @@ function Layout() {
         <Switch>
           <Route exact path="/">
             <button onClick={() => {history.push("/decks/new")}}>Crete Deck</button>
-            <DeckList decks={decks}/>
+            <DeckList />
           </Route>
           <Route path="/decks/new">
-            <DeckNew 
-              form={deckForm} 
-              setForm={setDeckForm} 
-              handleFormChange={handleFormChange} 
-            />
+            <DeckNew />
           </Route>
           <Route path="/decks/:deckId/cards/:cardId/edit">
             <CardEdit 
@@ -65,7 +50,6 @@ function Layout() {
             <CardNew 
               deck={deck} 
               setDeck={setDeck} 
-              handleFormChange={handleFormChange} 
             />
           </Route>
           <Route path="/decks/:deckId/study">
